@@ -14,24 +14,80 @@ program tictactoe
 
    turn = .true.  ! Initialize turn
 
+   call print_board(board)
+
    do while (.true.)
       win_status = check_win(board)
       if (win_status /= 0) then
-         exit  ! Exit the loop when game is won
+         exit
       end if
 
-      exit
+      read (*, *) i, j
+
+      if (turn) then
+         board(i, j) = 'X'
+      else
+         board(i, j) = 'O'
+      end if
+
+      turn = .not. turn
+
+      call print_board(board)
    end do
 
-contains
-   function check_win(board_arr) result(win_result)
-      character, dimension(3, 3), intent(in) :: board_arr
-      integer :: win_result
-      integer :: iter ! iterator for rows/columns
+   if (win_status .EQ. 1) then
+      print *, 'X Wins'
+   else if (win_status .EQ. 2) then
+      print *, 'O Wins'
+   end if
 
-      do i = 1, 1
-         ! if ()
+contains
+   function check_win(board) result(win_status)
+      character, dimension(3, 3), intent(in) :: board
+      integer :: win_status
+      integer :: i ! iterator for rows/columns
+
+      ! 'X' & 1 = 0
+      ! 'O' & 1 = 1
+      ! ICHAR(character) -> integer
+      ! IAND(integer, integer) -> integer & integer
+
+      do i = 1, 3
+         if (board(i, 1) .ne. ' ' .and. board(i, 1) .eq. board(i, 2) .and. board(i, 2) .eq. board(i, 3)) then
+            win_status = IAND(ICHAR(board(i, 1)), 1) + 1
+            return
+         end if
       end do
 
+      do j = 1, 3
+         if (board(1, j) .ne. ' ' .and. board(1, j) .eq. board(2, j) .and. board(2, j) .eq. board(3, j)) then
+            win_status = IAND(ICHAR(board(1, j)), 1) + 1
+            return
+         end if
+      end do
+
+      if (board(1, 1) .ne. ' ' .and. board(1, 1) .eq. board(2, 2) .and. board(2, 2) .eq. board(3, 3)) then
+         win_status = IAND(ICHAR(board(1, 1)), 1) + 1
+         return
+      end if
+
+      if (board(1, 3) .ne. ' ' .and. board(1, 3) .eq. board(2, 2) .and. board(2, 2) .eq. board(3, 1)) then
+         win_status = IAND(ICHAR(board(1, 3)), 1) + 1
+         return
+      end if
+
+      win_status = 0
+
    end function check_win
+
+   subroutine print_board(board)
+      character, dimension(3, 3), intent(in) :: board
+      integer :: i, j
+
+      do i = 1, 3
+         write (*, '(a)', advance='yes') '-------'
+         print '("|", A, "|", A, "|", A, "|")', board(i, 1), board(i, 2), board(i, 3)
+      end do
+      write (*, '(a)', advance='yes') '-------'
+   end subroutine print_board
 end program tictactoe
