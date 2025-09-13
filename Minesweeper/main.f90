@@ -2,11 +2,11 @@ module mod_board
    ! Make boards private
    private
    character, allocatable :: visible_board(:, :)
+   character, allocatable :: bomb_board(:, :)
    ! Make functions accessable
    public initialize_boards, print_board
 contains
-   subroutine initialize_boards(bomb_board)
-      character, allocatable, intent(inout) :: bomb_board(:, :)
+   subroutine initialize_boards()
       ! Boards will be NxN, so we will figure out what sizes to use
       integer :: n
       ! Iterators for the initialization
@@ -53,10 +53,9 @@ end module mod_board
 program minesweeper
    use mod_board
    implicit none
-   character, allocatable :: bomb_board(:, :)
 
    ! Will read the size from the user and create the NxN boards
-   call initialize_boards(bomb_board)
+   call initialize_boards()
 
    call print_board()
 
