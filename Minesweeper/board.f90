@@ -6,8 +6,25 @@ module mod_board
    character, allocatable :: bomb_board(:, :)
    complex :: cursor
    ! Make functions accessable
-   public initialize_boards, print_board, move_cursor
+   public reveal_current_cell, initialize_boards, print_board, move_cursor
 contains
+   subroutine reveal_current_cell()
+      integer :: x, y
+      x = INT(cursor%RE)
+      y = INT(cursor%IM)
+      if (visible_board(x, y) .NE. ' ') then
+         ! Skip mines that have already been revealed
+         return
+      end if
+
+      bomb_board(x, y) = '#'
+      if (bomb_board(x, y) .EQ. '#') then
+         visible_board(x, y) = '#'
+         call print_board()
+         print *, "Uncovered bomb. You Lost!"
+         stop
+      end if
+   end subroutine reveal_current_cell
    subroutine initialize_boards()
       ! Boards will be NxN, so we will figure out what sizes to use
       integer :: n
@@ -17,10 +34,11 @@ contains
       read *, n
 
       allocate (visible_board(n, 2*n))
-      ! * for blank/not clicked
-      ! _ (space) for nothing there
+      ! _ (space) for blank/not clicked
+      ! * for nothing there
       ! 1-8 for bomb numbers
       ! F for flag
+      ! # for bomb
       do i = 1, n
          do j = 1, 2*n
             visible_board(i, j) = ' '
@@ -60,14 +78,17 @@ contains
                cycle
             end if
 
-            ! * for blank/not clicked
-            ! _ (space) for nothing there
+            ! _ (space) blank/not clicked
+            ! * for nothing there
             ! 1-8 for bomb numbers
             ! F for flag
+            ! # for bomb
             if (visible_board(i, j) .EQ. 'F') then
-               call print_colored_bold(BG_RED, FG_BLACK, 'F')
+               call print_colored_bold(BG_BRIGHT_RED, FG_BLACK, 'F')
+            else if (visible_board(i, j) .EQ. '#') then
+               call print_colored_bold(BG_RED, FG_BLACK, '#')
             else if (visible_board(i, j) .EQ. '*') then
-               call print_colored(BG_WHITE, FG_BLACK, '*')
+               call print_colored(BG_WHITE, FG_BLACK, ' ')
             else if (visible_board(i, j) .EQ. ' ') then
                call print_colored(BG_BRIGHT_BLACK, FG_BLACK, ' ')
             else

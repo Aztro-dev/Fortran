@@ -12,6 +12,7 @@ program minesweeper
 
       read *, input
       if (input .EQ. '.') then
+         call reveal_current_cell()
       else if (input .EQ. 'f' .OR. input .EQ. 'F') then
       else
          call move_cursor(input)
