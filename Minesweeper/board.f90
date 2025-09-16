@@ -50,9 +50,7 @@ contains
       do i = 1, n
          ! Write all characters/cells in the line
          do j = 1, 2*n
-            ! Don't advance so we don't create a ton of newlines
-
-            ! If the cursor is currently on the cell, we gray it out a lil bit
+            ! If the cursor is currently on the cell, we make it CYAN
             if (int(cursor%RE) .EQ. i .AND. int(cursor%IM) .eq. j) then
                if (visible_board(i, j) .EQ. 'F') then
                   call print_colored(BG_CYAN, FG_BRIGHT_RED, visible_board(i, j))
