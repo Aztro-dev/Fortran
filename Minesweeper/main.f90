@@ -15,9 +15,13 @@ contains
       read *, n
 
       allocate (visible_board(n, n))
+      ! * for blank/not clicked
+      ! _ (space) for nothing there
+      ! 1-8 for bomb numbers
+      ! # for bomb
       do i = 1, n
          do j = 1, n
-            visible_board(i, j) = '*'
+            visible_board(i, j) = ' '
          end do
       end do
 
@@ -29,9 +33,6 @@ contains
    subroutine print_board()
       integer :: i, j
       integer :: n
-      character :: color_escape
-
-      color_escape = CHAR(27)
 
       ! Get the number of rows in the board, which
       ! should also be the same as the number of columns
@@ -41,7 +42,19 @@ contains
          ! Write all characters/cells in the line
          do j = 1, n
             ! Don't advance so we don't create a ton of newlines
-       write (*, '(A, "[107m", A, "[30m", A, A, "[0m")', advance="no") color_escape, color_escape, visible_board(i, j), color_escape
+            ! * for blank/not clicked
+            ! _ (space) for nothing there
+            ! 1-8 for bomb numbers
+            ! # for bomb
+            if (visible_board(i, j) .EQ. '#') then
+            else if (visible_board(i, j) .EQ. '*') then
+               ! write (*, '(A, "[107m", A, "[30m", A, A, "[0m")', advance="no") color_escape, color_escape, visible_board(i, j), color_escape
+            else if (visible_board(i, j) .EQ. ' ') then
+               print_colored("[107m", "[30m", ' ')
+               ! write (*, '(A, "[107m", " ", A, "[0m")', advance="no") color_escape, color_escape
+            else
+               write (*, '(A, "[107m", " ", A, "[0m")', advance="no") color_escape, color_escape
+            end if
          end do
          ! newline
          print *
