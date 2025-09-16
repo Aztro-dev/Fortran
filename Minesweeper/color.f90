@@ -2,8 +2,15 @@ module mod_color
    private
    character, parameter :: color_escape = CHAR(27)
 
-   ! Reset
+   ! Styles
    character(len=*), parameter, public :: STYLE_RESET = '[0m'
+   character(len=*), parameter, public :: STYLE_BOLD = '[1m'
+   character(len=*), parameter, public :: STYLE_DIM = '[2m'
+   character(len=*), parameter, public :: STYLE_ITALIC = '[3m'
+   character(len=*), parameter, public :: STYLE_UNDERLINE = '[4m'
+   character(len=*), parameter, public :: STYLE_BLINK = '[5m'
+   character(len=*), parameter, public :: STYLE_REVERSE = '[7m'
+   character(len=*), parameter, public :: STYLE_STRIKETHROUGH = '[9m'
 
    ! Foreground colors
    character(len=*), parameter, public :: FG_BLACK = '[30m'
@@ -47,12 +54,22 @@ module mod_color
    character(len=*), parameter, public :: BG_BRIGHT_CYAN = '[106m'
    character(len=*), parameter, public :: BG_BRIGHT_WHITE = '[107m'
 
-   public print_colored, print_styled
+   public print_colored, print_colored_bold
 
 contains
    subroutine print_colored(background, foreground, character)
       character(len=*), intent(in) :: background, foreground
       character, intent(in) :: character
-      write (*, '(A, A, A)', advance="no") color_escape//background//color_escape//foreground, character, color_escape//STYLE_RESET
+      write (*, '(A)', advance="no") color_escape//background//color_escape//foreground
+      write (*, '(A)', advance="no") character
+      write (*, '(A)', advance="no") color_escape//STYLE_RESET
    end subroutine print_colored
+
+   subroutine print_colored_bold(background, foreground, character)
+      character(len=*), intent(in) :: background, foreground
+      character, intent(in) :: character
+      write (*, '(A)', advance="no") color_escape//background//color_escape//foreground
+      write (*, '(A)', advance="no") color_escape//STYLE_BOLD//character
+      write (*, '(A)', advance="no") color_escape//STYLE_RESET
+   end subroutine print_colored_bold
 end module mod_color

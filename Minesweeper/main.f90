@@ -6,6 +6,9 @@ program minesweeper
    ! Will read the size from the user and create the NxN boards
    call initialize_boards()
 
-   call print_board()
+   do while (.TRUE.)
+      call print_board()
+      call move_cursor()
+   end do
 
 end program minesweeper
