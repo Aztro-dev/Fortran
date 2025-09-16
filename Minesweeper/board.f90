@@ -100,14 +100,12 @@ contains
 
    end subroutine print_board
 
-   subroutine move_cursor()
-      character :: char
+   subroutine move_cursor(char)
+      character, intent(in) :: char
       integer :: n
 
       ! Get the number of rows in the board
       n = SIZE(visible_board, 1)
-
-      read *, char
 
       if (char .EQ. 'q' .OR. char .EQ. 'Q') then
          stop
