@@ -2,11 +2,14 @@ module mod_board
    use mod_color
    ! Make boards private
    private
+   real, parameter :: BOMB_CHANCE = 0.20
+   ! Number of rows, half the number of columns
+   integer :: N
    character, allocatable :: visible_board(:, :)
    character, allocatable :: bomb_board(:, :)
    complex :: cursor
    ! Make functions accessable
-   public reveal_current_cell, initialize_boards, print_board, move_cursor
+   public reveal_current_cell, initialize_board, print_board, move_cursor
 contains
    subroutine reveal_current_cell()
       integer :: x, y
@@ -14,33 +17,40 @@ contains
       y = INT(cursor%IM)
       if (visible_board(x, y) .NE. ' ') then
          ! Skip mines that have already been revealed
+         ! Automatically skips flags, numbers, and clicked-blank cells.
          return
       end if
 
-      bomb_board(x, y) = '#'
+      if (.NOT. ALLOCATED(bomb_board)) then
+         call initialize_bomb_board()
+      end if
+
       if (bomb_board(x, y) .EQ. '#') then
          visible_board(x, y) = '#'
          call print_board()
          print *, "Uncovered bomb. You Lost!"
+         DEALLOCATE (bomb_board)
+         DEALLOCATE (visible_board)
          stop
       end if
    end subroutine reveal_current_cell
-   subroutine initialize_boards()
+
+   subroutine initialize_board(rows)
       ! Boards will be NxN, so we will figure out what sizes to use
-      integer :: n
+      integer, intent(in):: rows
       ! Iterators for the initialization
       integer :: i, j
 
-      read *, n
+      N = rows
 
-      allocate (visible_board(n, 2*n))
+      allocate (visible_board(N, 2*N))
       ! _ (space) for blank/not clicked
       ! * for nothing there
       ! 1-8 for bomb numbers
       ! F for flag
       ! # for bomb
-      do i = 1, n
-         do j = 1, 2*n
+      do i = 1, N
+         do j = 1, 2*N
             visible_board(i, j) = ' '
          end do
       end do
@@ -54,20 +64,36 @@ contains
       cursor = (3.0, 2.0)
 
       ! We will not populate the bomb board until the user has selected a spot.
-      allocate (bomb_board(n, 2*n))
+   end subroutine initialize_board
 
-   end subroutine initialize_boards
+   subroutine initialize_bomb_board()
+      real :: rand
+      integer :: i, j
+      integer, allocatable :: seed(:)
+      allocate (bomb_board(N, 2*N))
+
+      call random_seed(size=N)
+      allocate (seed(n))
+      call random_seed(get=seed)
+
+      do i = 1, N
+         do j = 1, 2*N
+            call RANDOM_NUMBER(rand)
+            if (rand .LE. BOMB_CHANCE) then
+               bomb_board(i, j) = '#'
+            else
+               bomb_board(i, j) = '.'
+            end if
+         end do
+      end do
+   end subroutine initialize_bomb_board
 
    subroutine print_board()
       integer :: i, j
-      integer :: n
 
-      ! Get the number of rows in the board
-      n = SIZE(visible_board, 1)
-
-      do i = 1, n
+      do i = 1, N
          ! Write all characters/cells in the line
-         do j = 1, 2*n
+         do j = 1, 2*N
             ! If the cursor is currently on the cell, we make it CYAN
             if (int(cursor%RE) .EQ. i .AND. int(cursor%IM) .eq. j) then
                if (visible_board(i, j) .EQ. 'F') then
@@ -123,10 +149,6 @@ contains
 
    subroutine move_cursor(char)
       character, intent(in) :: char
-      integer :: n
-
-      ! Get the number of rows in the board
-      n = SIZE(visible_board, 1)
 
       if (char .EQ. 'q' .OR. char .EQ. 'Q') then
          stop
@@ -145,12 +167,12 @@ contains
       end if
 
       if (INT(cursor%RE) .EQ. 0) then
-         cursor%RE = n
+         cursor%RE = N
       else if (INT(cursor%RE) .GT. n) then
          cursor%RE = 1
       end if
       if (INT(cursor%IM) .EQ. 0) then
-         cursor%IM = 2*n
+         cursor%IM = 2*N
       else if (INT(cursor%IM) .GT. 2*n) then
          cursor%IM = 1
       end if
