@@ -1,6 +1,7 @@
 
 program minesweeper
    use mod_board
+   use mod_color
    implicit none
    character :: input
    character(len=3) :: n_str ! max 3 digit number
@@ -18,17 +19,19 @@ program minesweeper
    ! Will read the size from the user and create the NxN boards
    call initialize_board(n)
 
-   do while (.TRUE.)
+   do while (.NOT. is_game_win())
       call print_board()
 
       read *, input
       if (input .EQ. '.') then
          call reveal_current_cell()
       else if (input .EQ. 'f' .OR. input .EQ. 'F') then
+         call place_flag()
       else
          call move_cursor(input)
       end if
-
    end do
+
+   print *, "You Win!"
 
 end program minesweeper
