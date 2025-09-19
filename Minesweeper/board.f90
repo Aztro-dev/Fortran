@@ -2,7 +2,7 @@ module mod_board
    use mod_color
    ! Make boards private
    private
-   real, parameter :: BOMB_CHANCE = 0.20
+   real, parameter :: BOMB_CHANCE = 0.17
    ! Number of rows, half the number of columns
    integer :: N
    character, allocatable :: visible_board(:, :)
