@@ -1,3 +1,5 @@
+!> Initialize and operate on the boards that we will use in the main program
+!> Contains most of the logic for the game.
 module mod_board
    use mod_color
    ! Make boards private

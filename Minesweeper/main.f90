@@ -1,4 +1,3 @@
-
 program minesweeper
    use mod_board
    use mod_color
