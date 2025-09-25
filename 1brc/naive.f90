@@ -9,6 +9,7 @@ module mod_weather_station
       integer :: N ! Number of entries (used for average)
    end type
 end module
+
 program naive
    use :: mod_weather_station
    implicit none
